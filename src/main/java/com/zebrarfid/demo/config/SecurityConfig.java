@@ -55,8 +55,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 // 配置接口访问权限
                 .authorizeRequests()
-                // 登录接口放行
-                .antMatchers("/api/login").permitAll()
+                // 登录,注册接口放行
+                .antMatchers("/api/login","/api/register").permitAll()
                 // 其他接口需要认证
                 .anyRequest().authenticated();
 
