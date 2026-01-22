@@ -1,0 +1,27 @@
+server:
+  port: 8080
+
+spring:
+  # 数据库配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/Zebra_RFID?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: root
+    password: root
+  # Spring Security默认关闭（自定义配置）
+  security:
+    basic:
+      enabled: false
+
+# MyBatis-Plus配置
+mybatis-plus:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.example.demo.entity
+  configuration:
+    map-underscore-to-camel-case: true # 下划线转驼峰
+
+# JWT自定义配置
+jwt:
+  secret: your-secret-key-1234567890 # 密钥（生产环境需加密存储）
+  expire: 86400000 # 过期时间（1天，单位：毫秒）
+  header: Authorization # 请求头名称
