@@ -1,7 +1,7 @@
 package com.zebrarfid.demo.controller;
 
 import com.zebrarfid.demo.dto.*;
-import com.zebrarfid.demo.dto.vo.SavedConfigVO;
+import com.zebrarfid.demo.dto.pringconnect.SavedConfigVO;
 import com.zebrarfid.demo.result.Result;
 import com.zebrarfid.demo.service.login.LoginService;
 import com.zebrarfid.demo.service.printconnect.PrinterService;
@@ -76,11 +76,9 @@ public class PrinterController {
     }
 
     // 辅助方法
-    // 根据用户名查询用户ID（实际可封装到UserService）
+    // 根据用户名查询用户ID
     private Long getUserIdByUsername(String username) {
-        // 调用UserMapper查询用户ID（示例，需结合现有UserMapper实现）
-        // 假设UserMapper有selectUserIdByUsername方法，或通过selectOne查询
-        // 通过LoginService获取用户ID，而不是硬编码
+
         return loginService.getUserIdByUsername(username);
 
     }

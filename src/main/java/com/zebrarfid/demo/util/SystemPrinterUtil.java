@@ -1,6 +1,6 @@
 package com.zebrarfid.demo.util;
 
-import com.zebrarfid.demo.dto.vo.PrinterVO;
+import com.zebrarfid.demo.dto.pringconnect.PrinterVO;
 import lombok.extern.slf4j.Slf4j;
 import java.io.BufferedReader;
 import java.io.IOException;

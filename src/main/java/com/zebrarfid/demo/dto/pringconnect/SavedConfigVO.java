@@ -1,5 +1,5 @@
 // SavedConfigVO.java（保存的配置VO）
-package com.zebrarfid.demo.dto.vo;
+package com.zebrarfid.demo.dto.pringconnect;
 
 import com.zebrarfid.demo.dto.PrinterConfigDTO;
 import lombok.Data;

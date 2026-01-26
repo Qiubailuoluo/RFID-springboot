@@ -1,5 +1,5 @@
 // TestConnectResponse.java（连接测试响应）
-package com.zebrarfid.demo.dto.vo;
+package com.zebrarfid.demo.dto.pringconnect;
 
 import lombok.Data;
 
