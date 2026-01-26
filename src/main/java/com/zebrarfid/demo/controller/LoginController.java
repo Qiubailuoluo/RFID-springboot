@@ -1,8 +1,8 @@
 package com.zebrarfid.demo.controller;
 
-import com.zebrarfid.demo.dto.LoginRequest;
-import com.zebrarfid.demo.dto.LoginResponse;
-import com.zebrarfid.demo.dto.RegisterRequest;
+import com.zebrarfid.demo.dto.login.LoginRequest;
+import com.zebrarfid.demo.dto.login.LoginResponse;
+import com.zebrarfid.demo.dto.login.RegisterRequest;
 import com.zebrarfid.demo.result.Result;
 import com.zebrarfid.demo.service.LoginService;
 import com.zebrarfid.demo.service.RegisterService;
@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class LoginController {
 
+    // 注入service层接口
     private final LoginService loginService;
     private final RegisterService registerService; // 添加RegisterService注入
 

@@ -1,4 +1,4 @@
-package com.zebrarfid.demo.dto;
+package com.zebrarfid.demo.dto.login;
 
 import lombok.Data;
 

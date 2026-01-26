@@ -25,6 +25,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    // 定义公共访问路径常量
+    private static final String[] PUBLIC_PATHS = {
+            "/api/login", // 登录接口
+            "/api/register" // 注册接口
+    };
+
     // 密码加密器（Spring Security自带BCrypt）
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -56,11 +62,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // 配置接口访问权限
                 .authorizeRequests()
                 // 登录,注册接口放行
-                .antMatchers("/api/login","/api/register").permitAll()
+                .antMatchers(PUBLIC_PATHS).permitAll()
                 // 其他接口需要认证
-                .anyRequest().authenticated();
-
-        // 添加JWT过滤器（在用户名密码过滤器之前）
-        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .anyRequest().authenticated()
+                .and()
+                // 添加JWT过滤器（在用户名密码过滤器之前）
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
     }
 }

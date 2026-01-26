@@ -1,8 +1,8 @@
 // src/main/java/com/zebrarfid/demo/service/impl/LoginServiceImpl.java
 package com.zebrarfid.demo.service.impl;
 
-import com.zebrarfid.demo.dto.LoginRequest;
-import com.zebrarfid.demo.dto.LoginResponse;
+import com.zebrarfid.demo.dto.login.LoginRequest;
+import com.zebrarfid.demo.dto.login.LoginResponse;
 import com.zebrarfid.demo.service.LoginService;
 import com.zebrarfid.demo.result.Result;
 import com.zebrarfid.demo.util.JwtUtil;

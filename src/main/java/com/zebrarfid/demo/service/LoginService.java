@@ -1,7 +1,7 @@
 package com.zebrarfid.demo.service;
 
-import com.zebrarfid.demo.dto.LoginRequest;
-import com.zebrarfid.demo.dto.LoginResponse;
+import com.zebrarfid.demo.dto.login.LoginRequest;
+import com.zebrarfid.demo.dto.login.LoginResponse;
 import com.zebrarfid.demo.result.Result;
 
 /**
