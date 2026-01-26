@@ -1,7 +1,10 @@
 package com.zebrarfid.demo.service.printconnect;
 
-import com.zebrarfid.demo.dto.*;
-import com.zebrarfid.demo.dto.pringconnect.*;
+import com.zebrarfid.demo.dto.printconnect.*;
+import com.zebrarfid.demo.dto.printconnect.vo.PrintTestResponse;
+import com.zebrarfid.demo.dto.printconnect.vo.PrinterVO;
+import com.zebrarfid.demo.dto.printconnect.vo.SavedConfigVO;
+import com.zebrarfid.demo.dto.printconnect.vo.TestConnectResponse;
 import com.zebrarfid.demo.result.Result;
 import java.util.List;
 

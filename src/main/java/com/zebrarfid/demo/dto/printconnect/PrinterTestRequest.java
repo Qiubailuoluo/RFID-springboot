@@ -1,5 +1,5 @@
 // PrinterTestRequest.java（测试打印机连接请求）
-package com.zebrarfid.demo.dto;
+package com.zebrarfid.demo.dto.printconnect;
 
 import lombok.Data;
 import javax.validation.Valid;

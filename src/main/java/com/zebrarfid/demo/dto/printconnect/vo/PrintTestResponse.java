@@ -1,5 +1,5 @@
 // PrintTestResponse.java（打印测试响应）
-package com.zebrarfid.demo.dto.pringconnect;
+package com.zebrarfid.demo.dto.printconnect.vo;
 
 import lombok.Data;
 

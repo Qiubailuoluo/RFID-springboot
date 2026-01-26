@@ -1,7 +1,7 @@
 package com.zebrarfid.demo.controller;
 
-import com.zebrarfid.demo.dto.*;
-import com.zebrarfid.demo.dto.pringconnect.SavedConfigVO;
+import com.zebrarfid.demo.dto.printconnect.*;
+import com.zebrarfid.demo.dto.printconnect.vo.SavedConfigVO;
 import com.zebrarfid.demo.result.Result;
 import com.zebrarfid.demo.service.login.LoginService;
 import com.zebrarfid.demo.service.printconnect.PrinterService;

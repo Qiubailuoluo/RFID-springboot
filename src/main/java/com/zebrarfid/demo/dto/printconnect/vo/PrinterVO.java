@@ -1,5 +1,5 @@
 // PrinterVO.java（打印机列表项）
-package com.zebrarfid.demo.dto.pringconnect;
+package com.zebrarfid.demo.dto.printconnect.vo;
 
 import lombok.Data;
 

@@ -1,7 +1,10 @@
 package com.zebrarfid.demo.service.impl.pringconnect;
 
-import com.zebrarfid.demo.dto.*;
-import com.zebrarfid.demo.dto.pringconnect.*;
+import com.zebrarfid.demo.dto.printconnect.*;
+import com.zebrarfid.demo.dto.printconnect.vo.PrintTestResponse;
+import com.zebrarfid.demo.dto.printconnect.vo.PrinterVO;
+import com.zebrarfid.demo.dto.printconnect.vo.SavedConfigVO;
+import com.zebrarfid.demo.dto.printconnect.vo.TestConnectResponse;
 import com.zebrarfid.demo.entity.PrinterConfig;
 import com.zebrarfid.demo.entity.User;
 import com.zebrarfid.demo.mapper.PrinterConfigMapper;

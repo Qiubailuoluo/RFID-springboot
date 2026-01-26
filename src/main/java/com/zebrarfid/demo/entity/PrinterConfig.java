@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.zebrarfid.demo.util.JsonUtil;
-import com.zebrarfid.demo.dto.PrinterConfigDTO;
+import com.zebrarfid.demo.dto.printconnect.PrinterConfigDTO;
 import lombok.Data;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
