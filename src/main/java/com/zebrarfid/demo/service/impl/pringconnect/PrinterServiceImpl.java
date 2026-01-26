@@ -1,6 +1,5 @@
-package com.zebrarfid.demo.service.impl;
+package com.zebrarfid.demo.service.impl.pringconnect;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.zebrarfid.demo.dto.*;
 import com.zebrarfid.demo.dto.vo.*;
 import com.zebrarfid.demo.entity.PrinterConfig;
@@ -8,7 +7,7 @@ import com.zebrarfid.demo.entity.User;
 import com.zebrarfid.demo.mapper.PrinterConfigMapper;
 import com.zebrarfid.demo.mapper.UserMapper;
 import com.zebrarfid.demo.result.Result;
-import com.zebrarfid.demo.service.PrinterService;
+import com.zebrarfid.demo.service.printconnect.PrinterService;
 import com.zebrarfid.demo.util.SystemPrinterUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -3,7 +3,8 @@ package com.zebrarfid.demo.controller;
 import com.zebrarfid.demo.dto.*;
 import com.zebrarfid.demo.dto.vo.SavedConfigVO;
 import com.zebrarfid.demo.result.Result;
-import com.zebrarfid.demo.service.PrinterService;
+import com.zebrarfid.demo.service.login.LoginService;
+import com.zebrarfid.demo.service.printconnect.PrinterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,7 +21,7 @@ import java.util.List;
 public class PrinterController {
 
     private final PrinterService printerService;
-    //private final UserService userService;
+    private final LoginService loginService;
 
     /**
      * 1. 获取（搜索）打印机列表
@@ -74,10 +75,13 @@ public class PrinterController {
         return printerService.loadPrinterConfigs(userId);
     }
 
-    // 辅助方法：根据用户名查询用户ID（实际可封装到UserService）
+    // 辅助方法
+    // 根据用户名查询用户ID（实际可封装到UserService）
     private Long getUserIdByUsername(String username) {
         // 调用UserMapper查询用户ID（示例，需结合现有UserMapper实现）
         // 假设UserMapper有selectUserIdByUsername方法，或通过selectOne查询
-        return 2L; // 测试用，实际需替换为真实查询逻辑
+        // 通过LoginService获取用户ID，而不是硬编码
+        return loginService.getUserIdByUsername(username);
+
     }
 }

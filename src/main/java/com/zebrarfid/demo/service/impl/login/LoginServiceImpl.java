@@ -1,9 +1,10 @@
 // src/main/java/com/zebrarfid/demo/service/impl/LoginServiceImpl.java
-package com.zebrarfid.demo.service.impl;
+package com.zebrarfid.demo.service.impl.login;
 
 import com.zebrarfid.demo.dto.login.LoginRequest;
 import com.zebrarfid.demo.dto.login.LoginResponse;
-import com.zebrarfid.demo.service.LoginService;
+import com.zebrarfid.demo.mapper.UserMapper;
+import com.zebrarfid.demo.service.login.LoginService;
 import com.zebrarfid.demo.result.Result;
 import com.zebrarfid.demo.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ public class LoginServiceImpl implements LoginService {
 
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
+    private final UserMapper userMapper;
 
     @Override
     public Result<LoginResponse> login(LoginRequest loginRequest) {
@@ -49,12 +51,36 @@ public class LoginServiceImpl implements LoginService {
     }
 
     /**
+     * 根据用户名获取用户ID
+     * 公有方法，用于非登入时获取用户ID
+     */
+    @Override
+    public Long getUserIdByUsername(String username) {
+        com.zebrarfid.demo.entity.User user = userMapper.selectByUsername(username);
+        if (user != null) {
+            return user.getId();
+        }
+        throw new RuntimeException("用户不存在: " + username);
+    }
+
+    /**
      * 从UserDetails获取用户ID
      * 注意：这里假设UserDetails实现类中有获取用户ID的方法
      */
     private Long getUserIdFromUserDetails(UserDetails userDetails) {
-        // 根据实际的UserDetails实现来获取用户ID
-        // 这里只是一个示例，需要根据实际情况调整
-        return 1L; // 临时返回值，需要根据实际业务逻辑修改
+        try {
+            com.zebrarfid.demo.entity.User user = userMapper.selectByUsername(userDetails.getUsername());
+            if (user != null) {
+                return user.getId();
+            }
+            throw new RuntimeException("用户不存在: " + userDetails.getUsername());
+        } catch (Exception e) {
+            // 记录异常信息以便调试
+            System.out.println("获取用户ID时发生异常: " + e.getMessage());
+            throw e;
+        }
+        //通过用户名查询用户ID
+        //return 1L;
+
     }
 }

@@ -1,7 +1,7 @@
 package com.zebrarfid.demo.config;
 
 import com.zebrarfid.demo.filter.JwtAuthenticationFilter;
-import com.zebrarfid.demo.service.UserDetailsServiceImpl;
+import com.zebrarfid.demo.service.impl.login.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

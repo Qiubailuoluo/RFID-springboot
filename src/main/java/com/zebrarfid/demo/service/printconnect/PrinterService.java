@@ -1,4 +1,4 @@
-package com.zebrarfid.demo.service;
+package com.zebrarfid.demo.service.printconnect;
 
 import com.zebrarfid.demo.dto.*;
 import com.zebrarfid.demo.dto.vo.*;

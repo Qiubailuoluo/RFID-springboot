@@ -1,6 +1,6 @@
 package com.zebrarfid.demo.filter;
 
-import com.zebrarfid.demo.service.UserDetailsServiceImpl;
+import com.zebrarfid.demo.service.impl.login.UserDetailsServiceImpl;
 import com.zebrarfid.demo.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

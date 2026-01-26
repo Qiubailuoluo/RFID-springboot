@@ -1,4 +1,4 @@
-package com.zebrarfid.demo.service;
+package com.zebrarfid.demo.service.impl.login;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.zebrarfid.demo.entity.User;

@@ -1,4 +1,4 @@
-package com.zebrarfid.demo.service;
+package com.zebrarfid.demo.service.login;
 
 import com.zebrarfid.demo.dto.login.LoginRequest;
 import com.zebrarfid.demo.dto.login.LoginResponse;
@@ -10,5 +10,8 @@ import com.zebrarfid.demo.result.Result;
 public interface LoginService {
     // 登录
     Result<LoginResponse> login(LoginRequest loginRequest);
+
+    //根据用户名查询用户id
+    Long getUserIdByUsername(String username);
 
 }
