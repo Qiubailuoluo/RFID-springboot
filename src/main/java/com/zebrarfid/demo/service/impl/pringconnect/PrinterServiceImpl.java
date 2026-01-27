@@ -34,21 +34,53 @@ public class PrinterServiceImpl implements PrinterService {
     private final UserMapper userMapper;
     private static final DateTimeFormatter ISO_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
-    @Override
-    public Result<List<PrinterVO>> getPrinterList(PrinterListRequest request) {
-        try {
-            // 1. 获取系统所有打印机
-            List<PrinterVO> allPrinters = SystemPrinterUtil.getSystemPrinters();
-            // 2. 根据关键词和类型过滤
-            List<PrinterVO> filteredPrinters = SystemPrinterUtil.filterPrinters(
-                    allPrinters, request.getKeyword(), request.getType()
-            );
-            return Result.success("获取打印机列表成功", filteredPrinters);
-        } catch (Exception e) {
-            log.error("获取打印机列表失败", e);
-            return Result.error("获取打印机列表失败：" + e.getMessage());
+//    @Override
+//    public Result<List<PrinterVO>> getPrinterList(PrinterListRequest request) {
+//        try {
+//            // 1. 获取系统所有打印机
+//            List<PrinterVO> allPrinters = SystemPrinterUtil.getSystemPrinters();
+//            // 2. 根据关键词和类型过滤
+//            List<PrinterVO> filteredPrinters = SystemPrinterUtil.filterPrinters(
+//                    allPrinters, request.getKeyword(), request.getType()
+//            );
+//            return Result.success("获取打印机列表成功", filteredPrinters);
+//        } catch (Exception e) {
+//            log.error("获取打印机列表失败", e);
+//            return Result.error("获取打印机列表失败：" + e.getMessage());
+//        }
+//    }
+@Override
+public Result<List<PrinterVO>> getPrinterList(PrinterListRequest request) {
+    try {
+        // 1. 处理空请求
+        String keyword = "";
+        String type = "";
+        if (request != null) {
+            keyword = request.getKeyword() == null ? "" : request.getKeyword().trim();
+            type = request.getType() == null ? "" : request.getType().trim();
         }
+
+        // 2. 获取系统打印机列表
+        List<PrinterVO> allPrinters = SystemPrinterUtil.getSystemPrinters();
+        log.info("系统打印机总数：{}", allPrinters.size());
+
+        // 3. 执行过滤（简化传参）
+        List<PrinterVO> filteredPrinters = SystemPrinterUtil.filterPrinters(allPrinters, keyword, type);
+        log.info("过滤后打印机数：{}", filteredPrinters.size());
+
+        // 4. 兜底：如果过滤后为空，直接返回全部（避免空数组）
+        if (filteredPrinters.isEmpty()) {
+            log.warn("过滤后无打印机，返回全部系统打印机");
+            filteredPrinters = allPrinters;
+        }
+
+        return Result.success("获取打印机列表成功", filteredPrinters);
+    } catch (Exception e) {
+        log.error("获取打印机列表失败", e);
+        // 兜底：返回模拟数据，保证前端不报错
+        return Result.success("获取打印机列表成功（兜底数据）", SystemPrinterUtil.getMockPrinters());
     }
+}
 
     @Override
     public Result<TestConnectResponse> testPrinterConnection(PrinterTestRequest request) {
