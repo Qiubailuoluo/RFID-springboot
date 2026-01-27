@@ -14,4 +14,8 @@ public class PrintTestRequest {
 
     @NotBlank(message = "测试打印内容不能为空")
     private String testData;         // 测试打印文本
+
+    // 新增必填字段
+    @NotBlank(message = "指令格式不能为空（可选：ZPL/ESC/POS/CPCL）")
+    private String commandType;      // 前端选择的指令格式（优先级最高）
 }

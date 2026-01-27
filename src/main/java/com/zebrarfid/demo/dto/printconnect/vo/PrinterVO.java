@@ -13,4 +13,8 @@ public class PrinterVO {
     private String ip;          // TCP IP地址（type=tcp时存在）
     private Integer port;       // TCP端口（type=tcp时存在）
     private String description; // 描述
+
+    // 新增字段
+    private String recommendCommandType; // 自动识别的指令格式
+    private String commandTemplate;      // 对应格式的测试模板
 }

@@ -110,6 +110,8 @@ public class SystemPrinterUtil {
                 }
 
                 printer.setDescription(printer.getType() + "类型打印机");
+                // 插入设置命令信息
+                setCommandInfo(printer);
                 printers.add(printer);
                 log.info("解析到Windows打印机：{}（状态：{}）", printer.getName(), printer.getStatus());
             } catch (Exception e) {
@@ -222,9 +224,11 @@ public class SystemPrinterUtil {
     }
 
     // 模拟数据（兜底用）
+    // 补充：模拟数据也加指令信息
     public static List<PrinterVO> getMockPrinters() {
         List<PrinterVO> mock = new ArrayList<>();
 
+        // 模拟ZPL打印机
         PrinterVO tcpPrinter = new PrinterVO();
         tcpPrinter.setId(UUID.randomUUID().toString());
         tcpPrinter.setName("ZDesigner ZD621R300dpi（TCP）");
@@ -233,25 +237,62 @@ public class SystemPrinterUtil {
         tcpPrinter.setIp("192.168.1.100");
         tcpPrinter.setPort(9100);
         tcpPrinter.setDescription("Zebra标签打印机（TCP/IP）");
+        setCommandInfo(tcpPrinter); // 新增：赋值指令信息
         mock.add(tcpPrinter);
 
+        // 模拟ESC/POS打印机
         PrinterVO usbPrinter = new PrinterVO();
         usbPrinter.setId(UUID.randomUUID().toString());
-        usbPrinter.setName("WPS 虚拟打印机（USB）");
+        usbPrinter.setName("Xprinter XP-58IIH（USB）");
         usbPrinter.setType("usb");
         usbPrinter.setStatus("online");
         usbPrinter.setAddress("USB001");
-        usbPrinter.setDescription("WPS虚拟打印机（USB）");
+        usbPrinter.setDescription("芯烨热敏小票打印机（USB）");
+        setCommandInfo(usbPrinter); // 新增：赋值指令信息
         mock.add(usbPrinter);
 
+        // 模拟UNKNOWN打印机
         PrinterVO networkPrinter = new PrinterVO();
         networkPrinter.setId(UUID.randomUUID().toString());
         networkPrinter.setName("Microsoft Print to PDF");
         networkPrinter.setType("network");
         networkPrinter.setStatus("online");
         networkPrinter.setDescription("微软PDF虚拟打印机");
+        setCommandInfo(networkPrinter); // 新增：赋值指令信息
         mock.add(networkPrinter);
 
         return mock;
+    }
+
+    // 核心：识别打印机指令格式 + 赋值模板
+    public static void setCommandInfo(PrinterVO printer) {
+        String printerName = printer.getName().toLowerCase();
+        String commandType;
+        String template;
+
+        // 1. 按名称识别指令格式（优先级：ZPL > ESC/POS > CPCL > UNKNOWN）
+        if (printerName.contains("zebra") || printerName.contains("zd") || printerName.contains("gk") || printerName.contains("gx") || printerName.contains("zt")) {
+            // ZPL：斑马标签打印机
+            commandType = "ZPL";
+            template = "^XA^FO20,20^A0N,25,25^FD测试打印（ZPL）^FS^FO20,50^BARCODE39,100^FD123456^FS^XZ";
+        } else if (printerName.contains("epson") || printerName.contains("star") || printerName.contains("xprinter") || printerName.contains("热敏") || printerName.contains("小票") || printerName.contains("佳博") || printerName.contains("芯烨")) {
+            // ESC/POS：小票打印机
+            commandType = "ESC/POS";
+            // 模板说明：\x1B@初始化打印机，\x1Ba1选简体中文，\n换行，\x0C切纸
+            template = "\\x1B@\\x1Ba1\\x1B2测试打印（ESC/POS）\\n\\n订单号：123456\\n\\x0C";
+        } else if (printerName.contains("ql") || printerName.contains("rw") || printerName.contains("移动标签")) {
+            // CPCL：斑马移动打印机
+            commandType = "CPCL";
+            template = "! 0 200 200 250 1\\nTEXT 4 0 30 40 测试打印（CPCL）\\nBARCODE 128 100 1 100 30 80 123456\\nFORM\\nPRINT";
+        } else {
+            // 未知格式，默认ZPL
+            commandType = "UNKNOWN";
+            template = "^XA^FO20,20^A0N,25,25^FD测试打印（默认ZPL）^FS^XZ";
+        }
+
+        // 2. 赋值给PrinterVO
+        printer.setRecommendCommandType(commandType);
+        printer.setCommandTemplate(template);
+        log.info("打印机{}的推荐指令格式：{}", printer.getName(), commandType);
     }
 }

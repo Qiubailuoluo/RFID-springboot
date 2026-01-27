@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -34,53 +35,40 @@ public class PrinterServiceImpl implements PrinterService {
     private final UserMapper userMapper;
     private static final DateTimeFormatter ISO_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
-//    @Override
-//    public Result<List<PrinterVO>> getPrinterList(PrinterListRequest request) {
-//        try {
-//            // 1. 获取系统所有打印机
-//            List<PrinterVO> allPrinters = SystemPrinterUtil.getSystemPrinters();
-//            // 2. 根据关键词和类型过滤
-//            List<PrinterVO> filteredPrinters = SystemPrinterUtil.filterPrinters(
-//                    allPrinters, request.getKeyword(), request.getType()
-//            );
-//            return Result.success("获取打印机列表成功", filteredPrinters);
-//        } catch (Exception e) {
-//            log.error("获取打印机列表失败", e);
-//            return Result.error("获取打印机列表失败：" + e.getMessage());
-//        }
-//    }
-@Override
-public Result<List<PrinterVO>> getPrinterList(PrinterListRequest request) {
-    try {
-        // 1. 处理空请求
-        String keyword = "";
-        String type = "";
-        if (request != null) {
-            keyword = request.getKeyword() == null ? "" : request.getKeyword().trim();
-            type = request.getType() == null ? "" : request.getType().trim();
+
+    /**
+     * 获取系统打印机列表
+     * 塞入 推荐指令格式 zpl等
+     * @param request
+     * @return
+     */
+    @Override
+    public Result<List<PrinterVO>> getPrinterList(PrinterListRequest request) {
+        try {
+            String keyword = "";
+            String type = "";
+            if (request != null) {
+                keyword = request.getKeyword() == null ? "" : request.getKeyword().trim();
+                type = request.getType() == null ? "" : request.getType().trim();
+            }
+
+            List<PrinterVO> allPrinters = SystemPrinterUtil.getSystemPrinters();
+            log.info("系统打印机总数：{}", allPrinters.size());
+
+            List<PrinterVO> filteredPrinters = SystemPrinterUtil.filterPrinters(allPrinters, keyword, type);
+            log.info("过滤后打印机数：{}", filteredPrinters.size());
+
+            if (filteredPrinters.isEmpty()) {
+                log.warn("过滤后无打印机，返回全部系统打印机");
+                filteredPrinters = allPrinters;
+            }
+
+            return Result.success("获取打印机列表成功", filteredPrinters);
+        } catch (Exception e) {
+            log.error("获取打印机列表失败", e);
+            return Result.success("获取打印机列表成功（兜底数据）", SystemPrinterUtil.getMockPrinters());
         }
-
-        // 2. 获取系统打印机列表
-        List<PrinterVO> allPrinters = SystemPrinterUtil.getSystemPrinters();
-        log.info("系统打印机总数：{}", allPrinters.size());
-
-        // 3. 执行过滤（简化传参）
-        List<PrinterVO> filteredPrinters = SystemPrinterUtil.filterPrinters(allPrinters, keyword, type);
-        log.info("过滤后打印机数：{}", filteredPrinters.size());
-
-        // 4. 兜底：如果过滤后为空，直接返回全部（避免空数组）
-        if (filteredPrinters.isEmpty()) {
-            log.warn("过滤后无打印机，返回全部系统打印机");
-            filteredPrinters = allPrinters;
-        }
-
-        return Result.success("获取打印机列表成功", filteredPrinters);
-    } catch (Exception e) {
-        log.error("获取打印机列表失败", e);
-        // 兜底：返回模拟数据，保证前端不报错
-        return Result.success("获取打印机列表成功（兜底数据）", SystemPrinterUtil.getMockPrinters());
     }
-}
 
     @Override
     public Result<TestConnectResponse> testPrinterConnection(PrinterTestRequest request) {
@@ -129,35 +117,45 @@ public Result<List<PrinterVO>> getPrinterList(PrinterListRequest request) {
     public Result<PrintTestResponse> sendTestPrint(PrintTestRequest request) {
         PrinterConfigDTO config = request.getConfig();
         String testData = request.getTestData();
+        String commandType = request.getCommandType().toUpperCase(); // 强制大写，避免前端传小写
         PrintTestResponse response = new PrintTestResponse();
         String timestamp = ISO_FORMATTER.format(LocalDateTime.now()) + "Z";
         response.setTimestamp(timestamp);
         response.setJobId("print_job_" + System.currentTimeMillis() + "_" + UUID.randomUUID().toString().substring(0, 6));
 
         try {
+            // 第一步：解析转义字符（如\x1B→0x1B）+ 按指令格式编码
+            byte[] printBytes = encodePrintData(testData, commandType);
+
+            // 第二步：按连接类型发送数据
             if ("tcp".equals(config.getType())) {
                 validateTcpConfig(config);
-                // TCP连接并发送打印数据
+                // TCP发送
                 try (Socket socket = new Socket(config.getIp(), config.getPort());
                      OutputStream os = socket.getOutputStream()) {
-                    os.write(testData.getBytes("UTF-8"));
+                    os.write(printBytes);
                     os.flush();
+                    log.info("TCP打印机({}:{})发送{}格式数据成功，数据长度：{}", config.getIp(), config.getPort(), commandType, printBytes.length);
                 }
             } else if ("usb".equals(config.getType())) {
                 validateUsbConfig(config);
-                // USB打印机打印逻辑（需本地设备访问权限）
-                log.info("向USB打印机 {} 发送测试打印：{}", config.getUsbPath(), testData);
-                // 此处省略USB打印数据发送逻辑
+                // USB发送（核心占位，需引入依赖后实现）
+                log.info("向USB打印机 {} 发送{}格式测试打印，数据长度：{}", config.getUsbPath(), commandType, printBytes.length);
+                throw new RuntimeException("USB打印暂未实现，请先引入USB通信库并完善逻辑");
             } else {
                 return Result.error("不支持的打印机类型：" + config.getType());
             }
 
-            response.setMessage("测试打印任务已发送至打印机");
+            response.setMessage("测试打印任务已发送至打印机（格式：" + commandType + "）");
             return Result.success("打印任务发送成功", response);
         } catch (IllegalArgumentException e) {
             log.error("打印参数错误", e);
             response.setMessage("打印失败：" + e.getMessage());
             return Result.success("打印任务发送失败", response);
+        } catch (RuntimeException e) {
+            log.error("USB打印未实现", e);
+            response.setMessage("打印失败：" + e.getMessage());
+            return Result.error("打印任务发送失败：" + e.getMessage());
         } catch (Exception e) {
             log.error("发送测试打印失败", e);
             response.setMessage("打印失败：" + e.getMessage());
@@ -227,5 +225,84 @@ public Result<List<PrinterVO>> getPrinterList(PrinterListRequest request) {
         if (config.getUsbPath() == null || config.getUsbPath().trim().isEmpty()) {
             throw new IllegalArgumentException("USB打印机设备路径不能为空");
         }
+    }
+
+    // 新增：按指令格式编码打印数据（核心）
+    private byte[] encodePrintData(String testData, String commandType) {
+        byte[] bytes;
+        // 第一步：解析转义字符（如\x1B→0x1B，\n→0x0A，\r→0x0D，\t→0x09）
+        String parsedData = parseEscapeChars(testData);
+
+        // 第二步：按指令格式选择编码
+        switch (commandType) {
+            case "ZPL":
+            case "CPCL":
+                // ZPL/CPCL：UTF-8编码
+                bytes = parsedData.getBytes(Charset.forName("UTF-8"));
+                break;
+            case "ESC/POS":
+                // ESC/POS：小票机90%用GBK编码（避免中文乱码）
+                bytes = parsedData.getBytes(Charset.forName("GBK"));
+                break;
+            default:
+                // 未知格式：默认UTF-8
+                bytes = parsedData.getBytes(Charset.forName("UTF-8"));
+                log.warn("未知指令格式{}，默认UTF-8编码", commandType);
+                break;
+        }
+        return bytes;
+    }
+
+    // 新增：解析转义字符（把\\x1B转为0x1B等）
+    private String parseEscapeChars(String input) {
+        if (input == null || input.isEmpty()) {
+            return "";
+        }
+        // 替换\\xXX为对应字节（如\\x1B→0x1B）
+        StringBuilder sb = new StringBuilder();
+        int i = 0;
+        while (i < input.length()) {
+            if (input.startsWith("\\x", i) && i + 3 < input.length()) {
+                // 提取\x后的两位16进制数
+                String hex = input.substring(i + 2, i + 4);
+                try {
+                    byte b = (byte) Integer.parseInt(hex, 16);
+                    sb.append((char) b);
+                    i += 4; // 跳过\\xXX
+                } catch (NumberFormatException e) {
+                    // 解析失败，原样保留
+                    sb.append(input.charAt(i));
+                    i++;
+                }
+            } else if (input.charAt(i) == '\\' && i + 1 < input.length()) {
+                // 处理常见转义字符
+                switch (input.charAt(i + 1)) {
+                    case 'n':
+                        sb.append('\n');
+                        i += 2;
+                        break;
+                    case 'r':
+                        sb.append('\r');
+                        i += 2;
+                        break;
+                    case 't':
+                        sb.append('\t');
+                        i += 2;
+                        break;
+                    case '\\':
+                        sb.append('\\');
+                        i += 2;
+                        break;
+                    default:
+                        sb.append(input.charAt(i));
+                        i++;
+                        break;
+                }
+            } else {
+                sb.append(input.charAt(i));
+                i++;
+            }
+        }
+        return sb.toString();
     }
 }
