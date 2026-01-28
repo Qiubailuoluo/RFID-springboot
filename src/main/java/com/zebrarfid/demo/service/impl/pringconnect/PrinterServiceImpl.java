@@ -12,6 +12,7 @@ import com.zebrarfid.demo.mapper.UserMapper;
 import com.zebrarfid.demo.result.Result;
 import com.zebrarfid.demo.service.printconnect.PrinterService;
 import com.zebrarfid.demo.util.SystemPrinterUtil;
+import jssc.SerialPortException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import com.zebrarfid.demo.util.UsbPrinterUtil;
 
 @Slf4j
 @Service
@@ -91,11 +93,20 @@ public class PrinterServiceImpl implements PrinterService {
                     response.setDetails(details);
                 }
             } else if ("usb".equals(config.getType())) {
-                // USB打印机：测试设备是否可访问（需本地权限）
                 validateUsbConfig(config);
-                // 此处省略USB设备连接逻辑（需调用本地库或执行系统命令）
-                response.setSuccess(true);
-                response.setMessage("USB打印机连接测试成功，设备已就绪。");
+                // USB连接测试（用新工具类）
+                boolean isConnected = UsbPrinterUtil.testUsbConnection(config.getUsbPath());
+                if (isConnected) {
+                    response.setSuccess(true);
+                    response.setMessage("USB打印机(" + config.getUsbPath() + ")连接成功");
+                    // 去掉msg:，直接传字符串+响应对象（Java语法）
+                    return Result.success("USB连接测试成功", response);
+                } else {
+                    response.setSuccess( false);
+                    response.setMessage("USB打印机(" + config.getUsbPath() + ")连接失败：端口不可用/无权限");
+                    // 去掉code:，直接传字符串+响应对象（Java语法）
+                    return Result.error("USB连接测试失败", response);
+                }
             } else {
                 return Result.error("不支持的打印机类型：" + config.getType());
             }
@@ -139,9 +150,13 @@ public class PrinterServiceImpl implements PrinterService {
                 }
             } else if ("usb".equals(config.getType())) {
                 validateUsbConfig(config);
-                // USB发送（核心占位，需引入依赖后实现）
-                log.info("向USB打印机 {} 发送{}格式测试打印，数据长度：{}", config.getUsbPath(), commandType, printBytes.length);
-                throw new RuntimeException("USB打印暂未实现，请先引入USB通信库并完善逻辑");
+                // USB发送（用新工具类）
+                try {
+                    UsbPrinterUtil.sendUsbPrintData(config.getUsbPath(), printBytes);
+                    log.info("USB打印机({})发送{}格式数据成功", config.getUsbPath(), commandType);
+                } catch (SerialPortException e) {
+                    throw new RuntimeException("USB打印失败：" + e.getMessage());
+                }
             } else {
                 return Result.error("不支持的打印机类型：" + config.getType());
             }

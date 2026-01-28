@@ -28,6 +28,15 @@ public class Result<T> {
         return new Result<>(500, msg, null);
     }
 
+    public static <T> Result<T> error(String msg, T data) {
+        return new Result<>(400, msg, data);
+    }
+
+    // 或者更灵活的版本，允许自定义错误码
+    public static <T> Result<T> error(int code, String msg, T data) {
+        return new Result<>(code, msg, data);
+    }
+
     // getter and setter methods
     public int getCode() { return code; }
     public void setCode(int code) { this.code = code; }
