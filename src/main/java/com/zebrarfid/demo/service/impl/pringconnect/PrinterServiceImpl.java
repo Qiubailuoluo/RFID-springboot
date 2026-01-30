@@ -72,6 +72,11 @@ public class PrinterServiceImpl implements PrinterService {
         }
     }
 
+    /**
+     * 测试打印机连接
+     * @param request
+     * @return
+     */
     @Override
     public Result<TestConnectResponse> testPrinterConnection(PrinterTestRequest request) {
         PrinterConfigDTO config = request.getConfig();
@@ -124,6 +129,11 @@ public class PrinterServiceImpl implements PrinterService {
         }
     }
 
+    /**
+     * 发送测试打印
+     * @param request
+     * @return
+     */
     @Override
     public Result<PrintTestResponse> sendTestPrint(PrintTestRequest request) {
         PrinterConfigDTO config = request.getConfig();
@@ -178,6 +188,12 @@ public class PrinterServiceImpl implements PrinterService {
         }
     }
 
+    /**
+     * 保存打印机配置
+     * @param request
+     * @param userId
+     * @return
+     */
     @Override
     public Result<?> savePrinterConfig(ConfigSaveRequest request, Long userId) {
         try {
@@ -203,6 +219,11 @@ public class PrinterServiceImpl implements PrinterService {
         }
     }
 
+    /**
+     * 加载打印机配置
+     * @param userId
+     * @return
+     */
     @Override
     public Result<List<SavedConfigVO>> loadPrinterConfigs(Long userId) {
         try {
